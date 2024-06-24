@@ -7,4 +7,6 @@ To-do list:
 - ^^ Break that statement down into several more specific statements
 - Separate grading simulation from visualization (using VISUALIZE boolean)
 - Add images for visuals (Maybe? Would require students to download more files...)
+- Clean up comments
+- Add documentation and instructions for students
 - Get people to test
