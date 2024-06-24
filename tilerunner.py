@@ -4,7 +4,7 @@ import tkinter as tk
 
 
 # Toggles visualization of robot. Set this to false to disable the
-# visual simulation.
+# visual simulation. 
 VISUALIZE = True
 
 # This is the file of the map to be used. You can change this to
