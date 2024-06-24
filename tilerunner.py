@@ -11,7 +11,7 @@ VISUALIZE = True
 # use any map you want. Feel free to test your robot on custom maps!
 #
 # Note: Your robot will ALWAYS start in the top left corner.
-MAP_FILE = "MAP_01.txt"
+MAP_FILE = "MAP_02.txt"
 
 # Size of each tile in pixels (Feel free to adjust to fit your screen)
 TILE_SIZE = 50
@@ -95,8 +95,9 @@ class Tile:
     def visit(self):
         self.status = VISITED
 
+    
     def __str__(self) -> str:
-        return f"Tile at ({self.row}, {self.col})"
+        return f"{['W', 'U', 'V'][self.status]}"
   
 
 # Environment setup
@@ -147,6 +148,12 @@ class Environment:
 
     def visitTile(self, tile: Tile):
         tile.set_status(VISITED)
+    
+    # Formats each row of the environment as a comma-separated list of tile-statuses ('U', 'V', or 'W'),
+    # where each row is separated by a newline. Used for testing if custom maps are parsed properly
+    def __str__(self) -> str:
+        return str(list(list(tile.__str__() for tile in row) for row in self.map)).replace("],", "]\n")
+
 
 
 class Robot:
@@ -156,8 +163,7 @@ class Robot:
         self.pos = pos
         self.x = 0
         self.y = 0
-        self.visited = set()
-        self.visited.add((self.x, self.y))
+        self.grid.add_visited(pos)
 
     def nextMove(self):
         """
@@ -174,10 +180,11 @@ class Robot:
         new_y = self.y + dy
 
         if 0 <= new_x < len(self.env.map[0]) and 0 <= new_y < len(self.env.map) and \
-                                    (new_x, new_y) not in self.grid.walls:
+                                    (self.env.map[new_y][new_x]) not in self.grid.walls:
             self.x = new_x
             self.y = new_y
-            self.visited.add((self.x, self.y))
+            self.pos = self.env.map[new_y][new_x]
+            self.grid.add_visited(self.pos)
         self.grid.update()
 
 class Grid:
@@ -188,11 +195,16 @@ class Grid:
                                 height=len(env.map)*TILE_SIZE)
         self.canvas.pack()
         self.walls = set()
-        self.robot = Robot(self, env[0][0]) # sets starting point in top left corner
-        self.create_walls()
+        self.visited = set()
+        self.robot = Robot(self, self.env, self.env.map[0][0]) # sets starting point in top left corner
+        self.initialize_sets()
         self.update()
+    
+    # To be used by Robot to add visited tiles
+    def add_visited(self, tile):
+        self.visited.add(tile)
 
-    def create_walls(self):
+    def initialize_sets(self):
         # Randomly create walls
         # for _ in range(15):
         #     x, y = random.randint(0, GRID_SIZE-1), random.randint(0, GRID_SIZE-1)
@@ -201,27 +213,33 @@ class Grid:
 
     def update(self):
         self.canvas.delete('all')
-        for x in range(len(self.env.map[0])):
-            for y in range(len(self.env.map)):
+        for y in range(len(self.env.map)):
+            for x in range(len(self.env.map[0])):
+                tile = self.env.map[y][x]
                 color = 'white'
-                if (x, y) in self.walls:
+                if tile in self.walls:
                     color = 'black'
-                elif (x, y) == (self.robot.x, self.robot.y):
+                elif tile == self.robot.pos:
                     color = 'red'
-                elif (x, y) in self.robot.visited:
+                elif tile in self.visited:
                     color = 'green'
                 self.canvas.create_rectangle(y*TILE_SIZE, x*TILE_SIZE,
                                              (y+1)*TILE_SIZE, (x+1)*TILE_SIZE,
                                              fill=color)
+    
+    def run(self):
+        self.robot.move()
+        self.master.after(500, self.run)
 
 
 def main():
+    env = Environment()
     root = tk.Tk()
     root.title("TileRunner Challenge")
-    env = Environment()
     grid = Grid(root, env)
     root.after(500, grid.run)
     root.mainloop()
+    # print(env)
     
 
 if __name__ == '__main__':
