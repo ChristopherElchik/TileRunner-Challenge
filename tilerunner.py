@@ -11,7 +11,7 @@ VISUALIZE = True
 # use any map you want. Feel free to test your robot on custom maps!
 #
 # Note: Your robot will ALWAYS start in the top left corner.
-MAP_FILE = "MAP_02.txt"
+MAP_FILE = "MAP_01.txt"
 
 # Size of each tile in pixels (Feel free to adjust to fit your screen)
 TILE_SIZE = 50
@@ -37,6 +37,9 @@ DIRECTIONS = {
     MOVE_RIGHT: (0, 1),
     STAY_STILL: (0, 0)
 }
+
+# Number of moves the user can make until the program cuts off
+ITERATIONS = 200
 
 # Tile info
 class Tile:
@@ -91,10 +94,6 @@ class Tile:
 
     def set_right(self, right):
         self.right = right
-
-    def visit(self):
-        self.status = VISITED
-
     
     def __str__(self) -> str:
         return f"{['W', 'U', 'V'][self.status]}"
@@ -168,7 +167,7 @@ class Robot:
     def nextMove(self):
         """
         This function should return the next move direction as a string.
-        Allowed directions are: 'up', 'down', 'left', 'right', 'none'.
+        Allowed directions are: MOVE_UP, MOVE_RIGHT, MOVE_DOWN, MOVE_LEFT, STAY_STILL.
         """
         # TODO: Implement the movement algorithm
         return random.choice(list(DIRECTIONS.keys()))  # Random move for starter
@@ -180,7 +179,7 @@ class Robot:
         new_y = self.y + dy
 
         if 0 <= new_x < len(self.env.map[0]) and 0 <= new_y < len(self.env.map) and \
-                                    (self.env.map[new_y][new_x]) not in self.grid.walls:
+                                    (self.env.map[new_y][new_x]).get_status() != WALL:
             self.x = new_x
             self.y = new_y
             self.pos = self.env.map[new_y][new_x]
@@ -191,10 +190,11 @@ class Grid:
     def __init__(self, master, env: Environment):
         self.master = master
         self.env = env
+        self.iteration = 0
         self.canvas = tk.Canvas(master, width=len(env.map[0])*TILE_SIZE,
                                 height=len(env.map)*TILE_SIZE)
         self.canvas.pack()
-        self.walls = set()
+        self.wall_count = 0
         self.visited = set()
         self.robot = Robot(self, self.env, self.env.map[0][0]) # sets starting point in top left corner
         self.initialize_sets()
@@ -203,13 +203,15 @@ class Grid:
     # To be used by Robot to add visited tiles
     def add_visited(self, tile):
         self.visited.add(tile)
+        self.env.visitTile(tile)
 
     def initialize_sets(self):
-        # Randomly create walls
-        # for _ in range(15):
-        #     x, y = random.randint(0, GRID_SIZE-1), random.randint(0, GRID_SIZE-1)
-        #     self.walls.add((x, y))
-        pass
+        for row in self.env.map:
+            for tile in row:
+                if (tile.get_status() == VISITED):
+                    self.add_visited(tile)
+                elif (tile.get_status() == WALL):
+                    self.wall_count += 1
 
     def update(self):
         self.canvas.delete('all')
@@ -217,19 +219,35 @@ class Grid:
             for x in range(len(self.env.map[0])):
                 tile = self.env.map[y][x]
                 color = 'white'
-                if tile in self.walls:
+                if tile.get_status() == WALL:
                     color = 'black'
                 elif tile == self.robot.pos:
                     color = 'red'
-                elif tile in self.visited:
+                elif tile.get_status() == VISITED:
                     color = 'green'
                 self.canvas.create_rectangle(y*TILE_SIZE, x*TILE_SIZE,
                                              (y+1)*TILE_SIZE, (x+1)*TILE_SIZE,
                                              fill=color)
     
+    def end_screen(self):
+        # Count results to see if student passed
+        visit_count = self.visited.__len__()
+        possible_count = len(self.env.map) * len(self.env.map[0]) - self.wall_count
+        percent_visited = visit_count / possible_count
+
+        display_text = f"You have reached {visit_count} out of {possible_count} possible tiles.\nYour score: {percent_visited * 100:.2f}%"
+        width = self.canvas.winfo_width()
+        height = self.canvas.winfo_height()
+        self.canvas.create_rectangle(0, 0, width, height, fill='black', stipple='gray50')
+        self.canvas.create_text(width/2, height/2, text=display_text, fill='white', font=('Helvetica', int(width/30), 'bold'), anchor='s')
+
     def run(self):
         self.robot.move()
-        self.master.after(500, self.run)
+        if(self.iteration >= ITERATIONS):
+            self.end_screen()
+            return
+        self.iteration += 1
+        self.master.after(20, self.run)
 
 
 def main():
@@ -240,6 +258,15 @@ def main():
     root.after(500, grid.run)
     root.mainloop()
     # print(env)
+
+    # # Count results to see if student passed
+    # visit_count = grid.visited.__len__()
+    # possible_count = len(env.map) * len(env.map[0]) - grid.wall_count
+    # percent_visited = visit_count / possible_count
+
+    # # Print results to terminal
+    # print(grid.wall_count)
+    # print(f"You have reached {visit_count} out of {possible_count} possible tiles. Your score: {percent_visited * 100:.2f}%")
     
 
 if __name__ == '__main__':
