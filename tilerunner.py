@@ -1,11 +1,16 @@
 # MAIN FILE FOR STUDENTS
 import random
 import tkinter as tk
+import copy
 
 
 # Toggles visualization of robot. Set this to false to disable the
 # visual simulation. 
 VISUALIZE = True
+
+# Number of iterations the simulation will run (when VISUALIZE = False). Our grading script will
+# run 100 iterations to see how consistent your robot is.
+ITERATIONS = 100
 
 # This is the file of the map to be used. You can change this to
 # use any map you want. Feel free to test your robot on custom maps!
@@ -39,7 +44,10 @@ DIRECTIONS = {
 }
 
 # Number of moves the user can make until the program cuts off
-ITERATIONS = 250
+MOVES = 250
+
+# Delay (in milliseconds) between robot moves
+DELAY = 20
 
 # Tile info
 class Tile:
@@ -144,9 +152,15 @@ class Environment:
                     self.map[r][c].set_below(self.map[r + 1][c])
                 if c < len(self.map[0]) - 1:
                     self.map[r][c].set_right(self.map[r][c + 1])
+        
+        self.original_map = copy.deepcopy(self.map)
 
     def visitTile(self, tile: Tile):
         tile.set_status(VISITED)
+
+    # resets environment for multiple simulations
+    def reset_map(self):
+        self.map = copy.deepcopy(self.original_map)
     
     # Formats each row of the environment as a comma-separated list of tile-statuses ('U', 'V', or 'W'),
     # where each row is separated by a newline. Used for testing if custom maps are parsed properly
@@ -171,6 +185,7 @@ class Robot:
         """
         # TODO: Implement the movement algorithm
         return random.choice(list(DIRECTIONS.keys()))  # Random move for starter
+        # return MOVE_DOWN
 
     def move(self):
         direction = self.nextMove()
@@ -184,21 +199,25 @@ class Robot:
             self.y = new_y
             self.pos = self.env.map[new_y][new_x]
             self.grid.add_visited(self.pos)
-        self.grid.update()
+        
+        if VISUALIZE:
+            self.grid.update()
 
 class Grid:
     def __init__(self, master, env: Environment):
         self.master = master
         self.env = env
-        self.iteration = 0
-        self.canvas = tk.Canvas(master, width=len(env.map[0])*TILE_SIZE,
-                                height=len(env.map)*TILE_SIZE)
-        self.canvas.pack()
+        self.move = 0
         self.wall_count = 0
         self.visited = set()
         self.robot = Robot(self, self.env, self.env.map[0][0]) # sets starting point in top left corner
         self.initialize_sets()
-        self.update()
+
+        if VISUALIZE:
+            self.canvas = tk.Canvas(master, width=len(env.map[0])*TILE_SIZE,
+                                    height=len(env.map)*TILE_SIZE)
+            self.canvas.pack()
+            self.update()
     
     # To be used by Robot to add visited tiles
     def add_visited(self, tile):
@@ -212,6 +231,15 @@ class Grid:
                     self.add_visited(tile)
                 elif (tile.get_status() == WALL):
                     self.wall_count += 1
+    
+    # resets grid for multiple simulations
+    def reset_grid(self):
+        self.env.reset_map()
+        self.move = 0
+        self.visited = set()
+        self.wall_count = 0
+        self.robot = Robot(self, self.env, self.env.map[0][0])
+        self.initialize_sets()
 
     def update(self):
         self.canvas.delete('all')
@@ -220,11 +248,11 @@ class Grid:
                 tile = self.env.map[y][x]
                 color = '#55AEF1'
                 if tile.get_status() == WALL:
-                    color = 'white'
+                    color = 'black'
                 elif tile == self.robot.pos:
                     color = 'red'
                 elif tile.get_status() == VISITED:
-                    color = 'black'
+                    color = 'white'
                 self.canvas.create_rectangle(x*TILE_SIZE, y*TILE_SIZE,
                                              (x+1)*TILE_SIZE, (y+1)*TILE_SIZE,
                                              fill=color)
@@ -251,20 +279,43 @@ class Grid:
 
     def run(self):
         self.robot.move()
-        if(self.iteration >= ITERATIONS):
-            self.end_screen()
+        if(self.move >= MOVES):
+            if VISUALIZE:
+                self.end_screen()
             return
-        self.iteration += 1
-        self.master.after(20, self.run)
+        self.move += 1
+        
+        if VISUALIZE:
+            self.master.after(DELAY, self.run) # add delay for visualization
+        else:
+            self.run() # no delay
 
 
 def main():
-    env = Environment()
-    root = tk.Tk()
-    root.title("TileRunner Challenge")
-    grid = Grid(root, env)
-    root.after(500, grid.run)
-    root.mainloop()
+    if VISUALIZE:
+        env = Environment()
+        root = tk.Tk()
+        root.title("TileRunner Challenge")
+        grid = Grid(root, env)
+        root.after(500, grid.run)
+        root.mainloop()
+    else:
+        # skip visuals and run a quick simulation for the given number of ITERATIONS
+        total_stats = [0, 0, 0] # running total of stats with each iteration
+        env = Environment()
+        root = tk.Tk()
+        grid = Grid(root, env)
+        for i in range(ITERATIONS):
+            grid.reset_grid()
+            grid.run()
+            stats = grid.collect_stats()
+            print(f"Round {i + 1} results: {stats[0]} tiles visited out of {stats[1]} possible tiles. Score: {stats[2]:.2f}")
+            total_stats[0] += stats[0]
+            total_stats[1] += stats[1]
+            total_stats[2] += stats[2]
+
+        print(f"\nAverage results: {total_stats[0]/ITERATIONS:.2f} tiles visited out of {total_stats[1]/ITERATIONS:.2f} possible tiles. Score: {total_stats[2]/ITERATIONS:.2f}")
+
     
 
 if __name__ == '__main__':
