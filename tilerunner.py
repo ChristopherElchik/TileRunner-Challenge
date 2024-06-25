@@ -39,7 +39,7 @@ DIRECTIONS = {
 }
 
 # Number of moves the user can make until the program cuts off
-ITERATIONS = 200
+ITERATIONS = 250
 
 # Tile info
 class Tile:
@@ -218,24 +218,32 @@ class Grid:
         for y in range(len(self.env.map)):
             for x in range(len(self.env.map[0])):
                 tile = self.env.map[y][x]
-                color = 'white'
+                color = '#55AEF1'
                 if tile.get_status() == WALL:
-                    color = 'black'
+                    color = 'white'
                 elif tile == self.robot.pos:
                     color = 'red'
                 elif tile.get_status() == VISITED:
-                    color = 'green'
-                self.canvas.create_rectangle(y*TILE_SIZE, x*TILE_SIZE,
-                                             (y+1)*TILE_SIZE, (x+1)*TILE_SIZE,
+                    color = 'black'
+                self.canvas.create_rectangle(x*TILE_SIZE, y*TILE_SIZE,
+                                             (x+1)*TILE_SIZE, (y+1)*TILE_SIZE,
                                              fill=color)
     
-    def end_screen(self):
-        # Count results to see if student passed
+    # Returns the robot's final stats in a tuple, indexed as follows:
+    #
+    # 0: number of tiles visited
+    # 1: number of possible tiles to visit (i.e., total tiles - walls)
+    # 2: Robot's score, calculated as the percent of tiles visited
+    def collect_stats(self):
         visit_count = self.visited.__len__()
         possible_count = len(self.env.map) * len(self.env.map[0]) - self.wall_count
         percent_visited = visit_count / possible_count
+        return (visit_count, possible_count, percent_visited)
 
-        display_text = f"You have reached {visit_count} out of {possible_count} possible tiles.\nYour score: {percent_visited * 100:.2f}%"
+    def end_screen(self):
+        # Count results to see if student passed
+        stats = self.collect_stats()
+        display_text = f"You have reached {stats[0]} out of {stats[1]} possible tiles.\nYour score: {stats[2] * 100:.2f}%"
         width = self.canvas.winfo_width()
         height = self.canvas.winfo_height()
         self.canvas.create_rectangle(0, 0, width, height, fill='black', stipple='gray50')
@@ -257,16 +265,6 @@ def main():
     grid = Grid(root, env)
     root.after(500, grid.run)
     root.mainloop()
-    # print(env)
-
-    # # Count results to see if student passed
-    # visit_count = grid.visited.__len__()
-    # possible_count = len(env.map) * len(env.map[0]) - grid.wall_count
-    # percent_visited = visit_count / possible_count
-
-    # # Print results to terminal
-    # print(grid.wall_count)
-    # print(f"You have reached {visit_count} out of {possible_count} possible tiles. Your score: {percent_visited * 100:.2f}%")
     
 
 if __name__ == '__main__':
