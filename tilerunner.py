@@ -16,7 +16,7 @@ ITERATIONS = 100
 # use any map you want. Feel free to test your robot on custom maps!
 #
 # Note: Your robot will ALWAYS start in the top left corner.
-MAP_FILE = "MAP_01.txt"
+MAP_FILE = "MAP_05.txt"
 
 # Size of each tile in pixels (Feel free to adjust to fit your screen)
 TILE_SIZE = 50
