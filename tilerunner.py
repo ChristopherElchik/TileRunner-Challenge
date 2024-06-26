@@ -16,7 +16,7 @@ ITERATIONS = 100
 # use any map you want. Feel free to test your robot on custom maps!
 #
 # Note: Your robot will ALWAYS start in the top left corner.
-MAP_FILE = "MAP_01.txt"
+MAP_FILE = "aylin_map.txt"
 
 # Size of each tile in pixels (Feel free to adjust to fit your screen)
 TILE_SIZE = 50
@@ -34,7 +34,7 @@ WALL = 0  # 'W' in file
 UNVISITED = 1  # 'U' in file
 VISITED = 2  # 'V' in file
 
-# Directions
+# Directions dictionary, maps a move to a vector
 DIRECTIONS = {
     MOVE_UP: (-1, 0),
     MOVE_DOWN: (1, 0),
@@ -43,10 +43,10 @@ DIRECTIONS = {
     STAY_STILL: (0, 0)
 }
 
-# Number of moves the user can make until the program cuts off
+# Number of moves the user can make until the program cuts off. Our grading script will allow 200 moves.
 MOVES = 200
 
-# Delay (in milliseconds) between robot moves
+# Delay (in milliseconds) between robot moves in the visual simulation. A higher delay causes a slower robot.
 DELAY = 20
 
 # Tile info
@@ -153,6 +153,7 @@ class Environment:
                 if c < len(self.map[0]) - 1:
                     self.map[r][c].set_right(self.map[r][c + 1])
         
+        # keeps a savestate of the original map incase we run multiple iterations
         self.original_map = copy.deepcopy(self.map)
 
     def visitTile(self, tile: Tile):
@@ -202,6 +203,7 @@ class Robot:
         else:
             return random.choice(list(DIRECTIONS.keys()))
 
+    # Moves the robot in the grid based on your nextMove() function. DO NOT change this function!
     def move(self):
         direction = self.nextMove()
         dx, dy = DIRECTIONS[direction]
