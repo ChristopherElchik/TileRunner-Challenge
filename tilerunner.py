@@ -3,7 +3,7 @@ import random
 import tkinter as tk
 import copy
 
-# Here is your starter code for the tile runner challenge. We already implemented the
+# This is your starter code for the tile runner challenge. We already implemented the
 # environment for you. Your ONLY job is to add code to the nextMove() function in the Robot class.
 # Here is a general outline of the file:
 #
