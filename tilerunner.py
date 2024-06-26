@@ -3,6 +3,34 @@ import random
 import tkinter as tk
 import copy
 
+# Here is your starter code for the tile runner challenge. We already implemented the
+# environment for you. Your ONLY job is to add code to the nextMove() function in the Robot class.
+# Here is a general outline of the file:
+#
+# - Tile class: This class holds the information about an individual tile on the grid. You can use
+# the get_status() function to get the status of a tile. A tile can have one of the following statuses:
+# WALL, VISITED, or UNVISITED. You can also view the tiles around a tile via the get_above(), get_right(), etc.
+# If you call the get_above() function on a tile where there is no tile above it, it will return None (this
+# applies to the other directions, too). You should not change any of the code in this class.
+#
+# - Environment class: This class handles the grid of tiles (called map), which is stored in a 2D array.
+# You will have access to this array from the robot class, but you shouldn't need to use it, as you can
+# already see your immediate surroundings via the getters from the Tile class. You should not change
+# any of the code in this class.
+#
+# - Robot class: This class controls the location and movements of your robot. All of your code MUST be
+# inside of this class for it to be graded properly. You will write code in the nextMove() function, where
+# you will tell the robot to do one of the following: MOVE_RIGHT, MOVE_LEFT, MOVE_UP, MOVE_DOWN, or STAY_STILL.
+# Your robot will keep track of its current location in a variable called self.pos, which will always be stored
+# as a Tile, meaning you can use Tile's functions to look at the tiles around you (e.g., self.pos.get_right()
+# to get the tile to your right). You can write code outside the nextMove() function if you wish (i.e., if
+# your algorithm needs to keep track of the robot's history), but your code MUST be inside the Robot class.
+# Be sure to not change the move() function.
+#
+# - Grid class: The Grid class handles the visual interface of the tile runner challenge, as well as the
+# elements behind the scenes, such as the robot's statistics and overall score. DO NOT change this class.
+#
+# Below are some global variables you can edit depending on how you want to test your robot.
 
 # Toggles visualization of robot. Set this to false to disable the
 # visual simulation. 
@@ -14,9 +42,15 @@ ITERATIONS = 100
 
 # This is the file of the map to be used. You can change this to
 # use any map you want. Feel free to test your robot on custom maps!
+# When grading, we will test your robot on many maps of different sizes and difficulties.
+#
+# All maps must be a .txt file, where each character represents a tile. Your arrangement of
+# characters must be in a rectangle. Your tiles can be represented by one of three characters:
+# 'U' for an unvisited tile, 'V' for a visited tile, and 'W' for a wall. You can use the
+# sample files as a reference.
 #
 # Note: Your robot will ALWAYS start in the top left corner.
-MAP_FILE = "aylin_map.txt"
+MAP_FILE = "MAP_03.txt"
 
 # Size of each tile in pixels (Feel free to adjust to fit your screen)
 TILE_SIZE = 50
@@ -34,7 +68,7 @@ WALL = 0  # 'W' in file
 UNVISITED = 1  # 'U' in file
 VISITED = 2  # 'V' in file
 
-# Directions dictionary, maps a move to a vector
+# Directions dictionary, maps a move to a vector... DO NOT CHANGE THESE
 DIRECTIONS = {
     MOVE_UP: (-1, 0),
     MOVE_DOWN: (1, 0),
@@ -61,48 +95,63 @@ class Tile:
         self.left = None
         self.right = None
 
+    # Returns status of tile
     def get_status(self):
         return self.status
 
+    # sets status of tile. We will do this for you. DO NOT use this function!
     def set_status(self, status):
         self.status = status
 
+    # returns row of tile
     def get_row(self):
         return self.row
 
+    # sets row of tile. This is done for you. DO NOT use this function!
     def set_row(self, row: int):
         self.row = row
 
+    # returns column of tile.
     def get_col(self):
         return self.col
 
+    # sets column of tile. This is done for you. DO NOT use this function!
     def set_col(self, col: int):
         self.col = col
 
+    # Returns the tile above this tile
     def get_above(self):
         return self.above
 
+    # Sets the tile above this tile. This is done for you. DO NOT use this function!
     def set_above(self, above):
         self.above = above
 
+    # Returns the tile below this tile
     def get_below(self):
         return self.below
 
+    # Sets the tile below this tile. This is done for you. DO NOT use this function!
     def set_below(self, below):
         self.below = below
 
+    # Returns the tile to the left of this tile
     def get_left(self):
         return self.left
 
+    # Sets the tile to the left of this tile. This is done for you. DO NOT use this function!
     def set_left(self, left):
         self.left = left
 
+    # Returns the tile to the right of this tile
     def get_right(self):
         return self.right
 
+    # Sets the tile to the right of this tile. This is done for you. DO NOT use this function!
     def set_right(self, right):
         self.right = right
     
+    # Returns the status of the tile as a string
     def __str__(self) -> str:
         return f"{['W', 'U', 'V'][self.status]}"
   
@@ -156,10 +205,11 @@ class Environment:
         # keeps a savestate of the original map incase we run multiple iterations
         self.original_map = copy.deepcopy(self.map)
 
+    # Sets a tile's status to VISITED. This is done for you. DO NOT use this function!
     def visitTile(self, tile: Tile):
         tile.set_status(VISITED)
 
-    # resets environment for multiple simulations
+    # resets environment for multiple simulations. DO NOT use this function!
     def reset_map(self):
         self.map = copy.deepcopy(self.original_map)
     
@@ -171,6 +221,8 @@ class Environment:
 
 
 class Robot:
+
+    # Constructs a robot given a Grid, environment and starting position (always top left of environment)
     def __init__(self, grid, env: Environment, pos: Tile):
         self.grid = grid
         self.env = env
@@ -179,6 +231,7 @@ class Robot:
         self.y = 0
         self.grid.add_visited(pos)
 
+    # This is the function you will implement to determine your robot's movement.
     def nextMove(self):
         """
         This function should return the next move direction as a string.
@@ -191,7 +244,7 @@ class Robot:
         right = self.pos.get_right()
         left = self.pos.get_left()
 
-        # Sample algorithm
+        # Sample algorithm (to be removed)
         if(below and below.get_status() != WALL and below.get_status() == UNVISITED):
             return MOVE_DOWN
         elif (right and right.get_status() != WALL and right.get_status() == UNVISITED):
@@ -203,7 +256,7 @@ class Robot:
         else:
             return random.choice(list(DIRECTIONS.keys()))
 
-    # Moves the robot in the grid based on your nextMove() function. DO NOT change this function!
+    # Moves the robot in the grid based on your nextMove() function. DO NOT use or edit this function!
     def move(self):
         direction = self.nextMove()
         dx, dy = DIRECTIONS[direction]
@@ -236,7 +289,7 @@ class Grid:
             self.canvas.pack()
             self.update()
     
-    # To be used by Robot to add visited tiles
+    # To be used by Robot's move() function to keep track of visited tiles. Student should not use this.
     def add_visited(self, tile):
         self.visited.add(tile)
         self.env.visitTile(tile)
@@ -263,7 +316,7 @@ class Grid:
         for y in range(len(self.env.map)):
             for x in range(len(self.env.map[0])):
                 tile = self.env.map[y][x]
-                color = '#55AEF1'
+                color = '#55AEF1' # color taken from Zebra's site
                 if tile.get_status() == WALL:
                     color = 'black'
                 elif tile == self.robot.pos:
@@ -294,6 +347,7 @@ class Grid:
         self.canvas.create_rectangle(0, 0, width, height, fill='black', stipple='gray50')
         self.canvas.create_text(width/2, height/2, text=display_text, fill='white', font=('Helvetica', int(width/30), 'bold'), anchor='s')
 
+    # recursively loops until the robot runs out of moves
     def run(self):
         self.robot.move()
         if(self.move >= MOVES):
@@ -333,7 +387,6 @@ def main():
 
         print(f"\nAverage results: {total_stats[0]/ITERATIONS:.2f} tiles visited out of {total_stats[1]/ITERATIONS:.2f} possible tiles. Score: {total_stats[2]/ITERATIONS:.2f}")
 
-    
 
 if __name__ == '__main__':
-    main()
+    main() # let it ripppp

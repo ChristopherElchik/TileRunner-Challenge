@@ -6,5 +6,5 @@ To-do list:
 - Add images for visuals (Maybe? Would require students to download more files...)
 - Clean up comments
 - Add documentation and instructions for students
-- Optimize (Repeated simulation is super slow)
+- Optimize
 - Get people to test
