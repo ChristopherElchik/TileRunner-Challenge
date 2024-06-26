@@ -6,7 +6,7 @@ import copy
 
 # Toggles visualization of robot. Set this to false to disable the
 # visual simulation. 
-VISUALIZE = False
+VISUALIZE = True
 
 # Number of iterations the simulation will run (when VISUALIZE = False). Our grading script will
 # run 100 iterations to see how consistent your robot is.
@@ -44,7 +44,7 @@ DIRECTIONS = {
 }
 
 # Number of moves the user can make until the program cuts off
-MOVES = 250
+MOVES = 200
 
 # Delay (in milliseconds) between robot moves
 DELAY = 20
