@@ -16,7 +16,7 @@ ITERATIONS = 100
 # use any map you want. Feel free to test your robot on custom maps!
 #
 # Note: Your robot will ALWAYS start in the top left corner.
-MAP_FILE = "MAP_05.txt"
+MAP_FILE = "MAP_01.txt"
 
 # Size of each tile in pixels (Feel free to adjust to fit your screen)
 TILE_SIZE = 50
@@ -184,8 +184,16 @@ class Robot:
         Allowed directions are: MOVE_UP, MOVE_RIGHT, MOVE_DOWN, MOVE_LEFT, STAY_STILL.
         """
         # TODO: Implement the movement algorithm
-        return random.choice(list(DIRECTIONS.keys()))  # Random move for starter
-        # return MOVE_DOWN
+        # return random.choice(list(DIRECTIONS.keys()))  # Random move for starter
+        above = self.pos.get_above()
+        below = self.pos.get_below()
+        right = self.pos.get_right()
+        left = self.pos.get_left()
+
+        if(below and below.get_status() != WALL):
+            return MOVE_DOWN
+        else:
+            return MOVE_RIGHT
 
     def move(self):
         direction = self.nextMove()
@@ -193,11 +201,11 @@ class Robot:
         new_x = self.x + dx
         new_y = self.y + dy
 
-        if 0 <= new_x < len(self.env.map[0]) and 0 <= new_y < len(self.env.map) and \
-                                    (self.env.map[new_y][new_x]).get_status() != WALL:
+        if 0 <= new_x < len(self.env.map) and 0 <= new_y < len(self.env.map[0]) and \
+                                    (self.env.map[new_x][new_y]).get_status() != WALL:
             self.x = new_x
             self.y = new_y
-            self.pos = self.env.map[new_y][new_x]
+            self.pos = self.env.map[new_x][new_y]
             self.grid.add_visited(self.pos)
         
         if VISUALIZE:
