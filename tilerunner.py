@@ -6,7 +6,7 @@ import copy
 
 # Toggles visualization of robot. Set this to false to disable the
 # visual simulation. 
-VISUALIZE = True
+VISUALIZE = False
 
 # Number of iterations the simulation will run (when VISUALIZE = False). Our grading script will
 # run 100 iterations to see how consistent your robot is.
@@ -190,10 +190,17 @@ class Robot:
         right = self.pos.get_right()
         left = self.pos.get_left()
 
-        if(below and below.get_status() != WALL):
+        # Sample algorithm
+        if(below and below.get_status() != WALL and below.get_status() == UNVISITED):
             return MOVE_DOWN
-        else:
+        elif (right and right.get_status() != WALL and right.get_status() == UNVISITED):
             return MOVE_RIGHT
+        elif (above and above.get_status() != WALL and above.get_status() == UNVISITED):
+            return MOVE_UP
+        elif (left and left.get_status() != WALL and left.get_status() == UNVISITED):
+            return MOVE_LEFT
+        else:
+            return random.choice(list(DIRECTIONS.keys()))
 
     def move(self):
         direction = self.nextMove()
