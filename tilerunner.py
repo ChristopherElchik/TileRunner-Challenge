@@ -34,7 +34,7 @@ import copy
 
 # Toggles visualization of robot. Set this to false to disable the
 # visual simulation. 
-VISUALIZE = False
+VISUALIZE = True
 
 # Number of iterations the simulation will run (when VISUALIZE = False). Our grading script will
 # run 100 iterations to see how consistent your robot is.
@@ -50,7 +50,7 @@ ITERATIONS = 100
 # sample files as a reference.
 #
 # Note: Your robot will ALWAYS start in the top left corner.
-MAP_FILE = "MAP_10.txt"
+MAP_FILE = "MAP_11.txt"
 
 # Size of each tile in pixels (Feel free to adjust to fit your screen)
 TILE_SIZE = 50

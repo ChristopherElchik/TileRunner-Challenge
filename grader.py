@@ -33,6 +33,7 @@ def main():
     avg_score /= NUM_MAPS
 
     print(f"Student's average score: {avg_score:.2f}")
+    print(f"Number of points earned for the challenge: {avg_score * 250000:.0f}")
 
 
 if __name__ == '__main__':
