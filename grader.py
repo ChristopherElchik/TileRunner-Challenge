@@ -4,7 +4,7 @@ import copy
 import tilerunner as tr
 
 # Number of maps to grade (All numbers from 1 to NUM_MAPS will be substituted into 'MAP_XX.txt')
-NUM_MAPS = 10
+NUM_MAPS = 20
 
 # map setter
 def set_map(mapName:str):
@@ -25,7 +25,7 @@ def main():
 
     for map_num in range(1, NUM_MAPS + 1):
 
-        map_name = f"MAP_{map_num:2}.txt".replace(' ', '0')
+        map_name = f"maps/MAP_{map_num:2}.txt".replace(' ', '0')
         set_map(map_name)
         stats = tr.main()
         print(f"Average performance on {map_name}: {stats[0]:.2f} tiles reached out of {stats[1]:.2f} possible tiles. Score: {stats[2]*100:.2f}")

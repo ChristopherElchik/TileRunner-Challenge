@@ -50,7 +50,7 @@ ITERATIONS = 100
 # sample files as a reference.
 #
 # Note: Your robot will ALWAYS start in the top left corner.
-MAP_FILE = "MAP_11.txt"
+MAP_FILE = "maps/MAP_20.txt"
 
 # Size of each tile in pixels (Feel free to adjust to fit your screen)
 TILE_SIZE = 50
@@ -283,6 +283,7 @@ class Grid:
         self.move = 0
         self.wall_count = 0
         self.visited = set()
+        self.pre_visited = 0
         self.robot = Robot(self, self.env, self.env.map[0][0]) # sets starting point in top left corner
         self.initialize_sets()
 
@@ -302,6 +303,7 @@ class Grid:
             for tile in row:
                 if (tile.get_status() == VISITED):
                     self.add_visited(tile)
+                    self.pre_visited += 1
                 elif (tile.get_status() == WALL):
                     self.wall_count += 1
     
@@ -310,6 +312,7 @@ class Grid:
         self.env.reset_map()
         self.move = 0
         self.visited = set()
+        self.pre_visited = 0
         self.wall_count = 0
         self.robot = Robot(self, self.env, self.env.map[0][0])
         self.initialize_sets()
@@ -333,11 +336,11 @@ class Grid:
     # Returns the robot's final stats in a tuple, indexed as follows:
     #
     # 0: number of tiles visited
-    # 1: number of possible tiles to visit (i.e., total tiles - walls)
+    # 1: number of possible tiles to visit (i.e., total tiles - walls - tiles that were already visited)
     # 2: Robot's score, calculated as the percent of tiles visited
     def collect_stats(self):
-        visit_count = self.visited.__len__()
-        possible_count = len(self.env.map) * len(self.env.map[0]) - self.wall_count
+        visit_count = self.visited.__len__() - self.pre_visited
+        possible_count = len(self.env.map) * len(self.env.map[0]) - self.wall_count - self.pre_visited
         percent_visited = visit_count / possible_count
         return (visit_count, possible_count, percent_visited)
 
@@ -370,6 +373,8 @@ def main() -> list:
     env = Environment()
     root = tk.Tk()
     grid = Grid(root, env)
+    avg_stats = [0, 0, 0] # Average to be calculated after all simulations are complete
+                          # (disregard if VISUALIZE == True)
 
     if VISUALIZE:
         root.title("TileRunner Challenge")
@@ -377,7 +382,6 @@ def main() -> list:
         root.mainloop()
     else:
         # skip visuals and run a quick simulation for the given number of ITERATIONS
-        avg_stats = [0, 0, 0] # Average to be calculated after all simulations are complete
         for i in range(ITERATIONS):
             grid.reset_grid()
             grid.run()
