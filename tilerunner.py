@@ -34,7 +34,7 @@ import copy
 
 # Toggles visualization of robot. Set this to false to disable the
 # visual simulation. 
-VISUALIZE = True
+VISUALIZE = False
 
 # Number of iterations the simulation will run (when VISUALIZE = False). Our grading script will
 # run 100 iterations to see how consistent your robot is.
@@ -50,10 +50,13 @@ ITERATIONS = 100
 # sample files as a reference.
 #
 # Note: Your robot will ALWAYS start in the top left corner.
-MAP_FILE = "MAP_03.txt"
+MAP_FILE = "MAP_10.txt"
 
 # Size of each tile in pixels (Feel free to adjust to fit your screen)
 TILE_SIZE = 50
+
+# Set to true to results of non-visual simulation
+PRINT_RESULTS = True
 
 # constants to define the robot's movement. Your nextMove() function
 # MUST return one of these. DO NOT change these values!
@@ -362,30 +365,32 @@ class Grid:
             self.run() # no delay
 
 
-def main():
+def main() -> list:
+
+    env = Environment()
+    root = tk.Tk()
+    grid = Grid(root, env)
+
     if VISUALIZE:
-        env = Environment()
-        root = tk.Tk()
         root.title("TileRunner Challenge")
-        grid = Grid(root, env)
         root.after(500, grid.run)
         root.mainloop()
     else:
         # skip visuals and run a quick simulation for the given number of ITERATIONS
-        total_stats = [0, 0, 0] # running total of stats with each iteration
-        env = Environment()
-        root = tk.Tk()
-        grid = Grid(root, env)
+        avg_stats = [0, 0, 0] # Average to be calculated after all simulations are complete
         for i in range(ITERATIONS):
             grid.reset_grid()
             grid.run()
             stats = grid.collect_stats()
-            print(f"Round {i + 1} results: {stats[0]} tiles visited out of {stats[1]} possible tiles. Score: {stats[2]:.2f}")
-            total_stats[0] += stats[0]
-            total_stats[1] += stats[1]
-            total_stats[2] += stats[2]
+            if PRINT_RESULTS:
+                print(f"Round {i + 1} results: {stats[0]} tiles visited out of {stats[1]} possible tiles. Score: {stats[2]:.2f}")
+            for j in range(3): avg_stats[j] += stats[j]
 
-        print(f"\nAverage results: {total_stats[0]/ITERATIONS:.2f} tiles visited out of {total_stats[1]/ITERATIONS:.2f} possible tiles. Score: {total_stats[2]/ITERATIONS:.2f}")
+        for i in range(3): avg_stats[i] /= ITERATIONS
+        if PRINT_RESULTS:
+            print(f"\nAverage results: {avg_stats[0]:.2f} tiles visited out of {avg_stats[1]:.2f} possible tiles. Score: {avg_stats[2]:.2f}")
+    
+    return avg_stats # for use by autograder
 
 
 if __name__ == '__main__':
