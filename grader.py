@@ -15,7 +15,7 @@ def main():
     # force no visualization
     tr.VISUALIZE = False
 
-    # Only print grader's results1
+    # Only print grader's results
     tr.PRINT_RESULTS = False
     tr.ITERATIONS = 100
     tr.MOVES = 200
