@@ -7,4 +7,4 @@ To-do list:
 - Clean up comments
 - Add documentation and instructions for students
 - Optimize
-- Get people to test
+- Test
