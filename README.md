@@ -1,10 +1,7 @@
 # TileRunner-Challenge
- Tile Runner challenge for Zebra Robotics
+Tile Runner challenge for Zebra Robotics
 
-To-do list:
+This challenge is meant to serve as an introduction to AI for students who are learning python.
 
-- Add images for visuals (Maybe? Would require students to download more files...)
-- Clean up comments
-- Add documentation and instructions for students
-- Optimize
-- Test
+## Provided Files
+
