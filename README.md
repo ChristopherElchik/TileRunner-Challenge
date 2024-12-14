@@ -16,3 +16,15 @@ This file is for teaching staff to determine the score of a student's robot by r
 ### maps/*
 
 All files in the maps folder are example maps that the students can use to test their robots. Maps 1-20 will be used to score the robot's performance. Note that the students will be given maps 1-10, where maps 11-20 will be hidden test cases to incentivize adaptable algorithms over hard-coded movements.
+
+## Visualizations
+
+Below are a couple images of an example robot in action. The visualizations are included in tilerunner.py and can be toggled on/off.
+
+### MAP_06.txt
+
+![MAP_06_example](https://github.com/ChristopherElchik/TileRunner-Challenge/blob/8538a322c3730de6566eb583dfc55fb324143f7f/images/MAP_06_example.png)
+
+### MAP_11.txt
+
+![MAP_11_example](https://github.com/ChristopherElchik/TileRunner-Challenge/blob/8538a322c3730de6566eb583dfc55fb324143f7f/images/MAP_11_example.png)
